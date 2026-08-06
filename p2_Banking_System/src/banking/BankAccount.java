@@ -1,25 +1,27 @@
 package banking;
 
+import java.util.ArrayList;
+
 public class BankAccount {
-    private String accountNumber;
-    private String holderName;
+    private final String accountNumber;
+    private final Customer holder;
     private double balance;
+    private final ArrayList<Transaction> transactions;
 
     // Constructor
-    public BankAccount(String accountNumber, String holderName) {
+    public BankAccount(String accountNumber, Customer holder) {
         this.accountNumber = accountNumber;
-        this.holderName = holderName;
+        this.holder = holder;
         this.balance = 0;
+        this.transactions = new ArrayList<>();
     }
+
     // Getters & Setters
     public String getAccountNumber(){
         return accountNumber;
     }
-    public void setHolderName(String holderName){
-        this.holderName = holderName;
-    }
-    public String getHolderName(){
-        return holderName;
+    public Customer getHolder(){
+        return holder;
     }
     public double getBalance(){
         return balance;
@@ -27,27 +29,86 @@ public class BankAccount {
 
     // Methods
     // Deposit
-    public void deposit(double amount){
-        if (amount > 0) {
-            balance += amount;
-            System.out.println("Deposit successful.");
-            System.out.printf("Current balance: $%.2f%n",balance);
-        } else{
-            System.out.println("The deposit amount should be greater than $0.00.");
+    public boolean deposit(double amount){
+        if (amount <= 0){
+            return false;
         }
+        balance += amount;
+        addTransaction(
+                TransactionType.DEPOSIT,
+                amount,
+                "Cash deposit."
+        );
+        return true;
     }
     // Withdraw
-    public void withdraw(double amount){
+    public boolean withdraw(double amount){
         if (amount <= 0){
-            System.out.println("The withdraw amount must be greater than $0.00.");
-            return;
+            return false;
         }
         if (amount > balance){
-            System.out.println("Insufficient funds.");
-            return;
+            return false;
         }
         balance -= amount;
-        System.out.println("Withdrawal successful.");
-        System.out.printf("Current balance: $%.2f%n",balance);
+        addTransaction(
+                TransactionType.WITHDRAWAL,
+                amount,
+                "Cash withdrawal."
+        );
+        return true;
+    }
+
+    private void addTransaction(
+            TransactionType type,
+            double amount,
+            String description
+    ){
+        Transaction transaction = new Transaction(
+                type,
+                amount,
+                description
+        );
+        transactions.add(transaction);
+    }
+    boolean transferOut(double amount, String destinationAccountNumber){
+        if (amount <= 0 || amount > balance){
+            return false;
+        }
+        balance -= amount;
+        addTransaction(
+                TransactionType.TRANSFER_OUT,
+                amount,
+                "Transfer to account " + destinationAccountNumber
+        );
+        return true;
+    }
+
+    boolean transferIn(double amount, String sourceAccountNumber){
+        if(amount <= 0){
+            return false;
+        }
+        balance += amount;
+        addTransaction(
+                TransactionType.TRANSFER_IN,
+                amount,
+                "Transfer from account " + sourceAccountNumber
+        );
+        return true;
+    }
+
+    public void showTransactions(){
+        if (transactions.isEmpty()){
+            System.out.println("No transactions found.");
+            return;
+        }
+        for (Transaction transaction : transactions){
+            System.out.printf(
+                    "%s | %s | $%.2f | %s%n",
+                    transaction.getDate(),
+                    transaction.getType(),
+                    transaction.getAmount(),
+                    transaction.getDescription()
+            );
+        }
     }
 }
