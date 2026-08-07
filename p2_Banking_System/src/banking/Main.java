@@ -1,49 +1,119 @@
 package banking;
 
+import java.util.Scanner;
+
 public class Main {
-    static void main(String[] args) {
+    public static void main(String[] args) {
         Bank bank = new Bank();
+        Scanner scanner = new Scanner(System.in);
 
-        Customer customer1 = new Customer(1,"Ronaldo Sosa", "ronaldo@email.com");
-        Customer customer2 = new Customer(2,"Natalhia Mejia", "natalhia@email.com");
-        BankAccount rjsa = new BankAccount("ACC-001", customer1);
-        BankAccount njms = new BankAccount("ACC-002", customer2);
+        boolean running = true;
 
-        bank.addAccount(rjsa);
-        bank.addAccount(njms);
+        while(running) {
+            System.out.println("""
+                    ---------------------
+                          BANK SYSTEM
+                    ---------------------
+                    Choose an option:
+                    1. Create account
+                    2. Deposit cash
+                    3. Withdraw cash
+                    4. Money transfer
+                    5. Show accounts
+                    6. Show transactions
+                    7. Exit app
+                    
+                    Option:
+                    """);
+            int option = scanner.nextInt();
+            scanner.nextLine();
 
-        System.out.println();
+            switch (option) {
+                case 1: {
+                    System.out.println("=== CREATE ACCOUNT ===");
+                    System.out.print("Customer ID: ");
+                    int id = scanner.nextInt();
+                    scanner.nextLine();
 
-        bank.showAccounts();
+                    System.out.print("Customer name: ");
+                    String name = scanner.nextLine();
 
-        System.out.println();
+                    System.out.print("Email: ");
+                    String email = scanner.nextLine();
 
-        bank.deposit("ACC-001", 200);
-        System.out.println();
-        bank.deposit("ACC-002", 400);
-        System.out.println();
-        bank.showAccounts();
-        System.out.println();
-        System.out.println("Total accounts: "+bank.getNumberOfAccounts());
-        bank.deposit("ACC-dsa", 90);
-        bank.deposit("ACC-001", -800);
+                    System.out.print("Account number: ");
+                    String accountNumber = scanner.nextLine();
 
-        bank.transfer("ACC-001", "ACC-002", 300);   // Valid transfer
-        bank.transfer("ACC-001", "ACC-002", -50);   // Invalid amount
-        bank.transfer("ACC-001", "ACC-002", 5000);  // Insufficient funds
-        bank.transfer("ACC-001", "ACC-001", 100);   // Same account
-        bank.transfer("ACC-999", "ACC-002", 100);   // Source account not found
-        bank.transfer("ACC-001", "ACC-999", 100);   // Destination account not found
+                    Customer customer = new Customer(id, name, email);
+                    bank.createAccount(accountNumber, customer);
 
-        // Testing Transaction
-        Transaction transaction = new Transaction(
-                TransactionType.DEPOSIT,
-                500,
-                "Initial Deposit"
-        );
-        System.out.println(transaction.getType());
-        System.out.println(transaction.getAmount());
-        System.out.println(transaction.getDate());
-        System.out.println(transaction.getDescription());
+                    break;
+                }
+                case 2: {
+                    System.out.println("===== DEPOSIT =====");
+                    System.out.print("Account number: ");
+                    String accountNumber = scanner.nextLine();
+
+                    System.out.print("Amount: ");
+                    double amount = scanner.nextDouble();
+                    scanner.nextLine();
+
+                    bank.deposit(accountNumber, amount);
+                    break;
+                }
+                case 3: {
+                    System.out.println("===== WITHDRAW =====");
+                    System.out.print("Account number: ");
+                    String accountNumber = scanner.nextLine();
+
+                    System.out.print("Amount: ");
+                    double amount = scanner.nextDouble();
+                    scanner.nextLine();
+
+                    bank.withdraw(accountNumber, amount);
+                    break;
+                }
+                case 4:{
+                    System.out.println("===== TRANSFER =====");
+                    System.out.print("Source account: ");
+                    String source = scanner.nextLine();
+
+                    System.out.print("Destination account: ");
+                    String destination = scanner.nextLine();
+
+                    System.out.print("Amount: ");
+                    double amount = scanner.nextDouble();
+                    scanner.nextLine();
+
+                    bank.transfer(source, destination, amount);
+                    break;
+                }
+                case 5: {
+                    System.out.println("===== ACCOUNTS =====");
+                    bank.showAccounts();
+                    break;
+                }
+                case 6: {
+                    System.out.println("===== TRANSACTION HISTORY =====");
+
+                    System.out.print("Account number: ");
+                    String accountNumber = scanner.nextLine();
+
+                    bank.showTransactions(accountNumber);
+                    break;
+                }
+
+                case 7: {
+                    running = false;
+                    System.out.println("Thank you for using this app!");
+                    break;
+                }
+
+                default: {
+                    System.out.println("Choose a valid option.");
+                }
+            }
+        }
+        scanner.close();
     }
 }

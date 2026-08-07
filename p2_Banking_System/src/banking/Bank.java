@@ -128,4 +128,31 @@ public class Bank {
         System.out.printf("Amount transferred: $%.2f%n", amount);
         System.out.printf("Source account balance: $%.2f%n", source.getBalance());
     }
-}
+
+    public void showTransactions(String accountNumber){
+        BankAccount account = findAccount(accountNumber);
+
+        if (account == null){
+            System.out.println("Account not found.");
+            return;
+        }
+
+        System.out.printf("TRANSACTION HISTORY: %s%n", account.getAccountNumber());
+        account.showTransactions();
+    }
+
+    public void createAccount(String accountNumber, Customer customer){
+        if (accountNumber == null || accountNumber.isBlank()) {
+            System.out.println("The account number cannot be empty.");
+            return;
+        }
+
+        if (customer == null) {
+            System.out.println("The customer cannot be null.");
+            return;
+        }
+
+        BankAccount account = new BankAccount(accountNumber, customer);
+        addAccount(account);
+        }
+    }

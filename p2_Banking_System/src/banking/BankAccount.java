@@ -1,5 +1,6 @@
 package banking;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 public class BankAccount {
@@ -43,18 +44,18 @@ public class BankAccount {
     }
     // Withdraw
     public boolean withdraw(double amount){
-        if (amount <= 0){
+        if (amount <= 0 || amount > balance){
             return false;
         }
-        if (amount > balance){
-            return false;
-        }
+
         balance -= amount;
+
         addTransaction(
                 TransactionType.WITHDRAWAL,
                 amount,
                 "Cash withdrawal."
         );
+
         return true;
     }
 
@@ -84,6 +85,7 @@ public class BankAccount {
     }
 
     boolean transferIn(double amount, String sourceAccountNumber){
+
         if(amount <= 0){
             return false;
         }
@@ -97,6 +99,8 @@ public class BankAccount {
     }
 
     public void showTransactions(){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
         if (transactions.isEmpty()){
             System.out.println("No transactions found.");
             return;
@@ -104,7 +108,7 @@ public class BankAccount {
         for (Transaction transaction : transactions){
             System.out.printf(
                     "%s | %s | $%.2f | %s%n",
-                    transaction.getDate(),
+                    transaction.getDate().format(formatter),
                     transaction.getType(),
                     transaction.getAmount(),
                     transaction.getDescription()
